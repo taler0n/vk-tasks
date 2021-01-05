@@ -5,7 +5,7 @@ import common
 
 
 def main():
-    user_ids = common.get_user_ids("users.txt")
+    user_ids = common.get_list("users.txt", True)
     session = common.get_session("credentials.txt")
     api = session.get_api()
     tools = vk_api.VkTools(session)
