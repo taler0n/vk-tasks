@@ -32,8 +32,12 @@ def get_regex_from_file(filename):
 
 def check_group(group_info, found_info, keywords, blacklist=None, allowed_activities=None):
     name = group_info["name"]
-    status = group_info["status"]
-    desc = group_info["description"]
+    status = ""
+    desc = ""
+    if group_info.get("status"):
+        status = group_info["status"]
+    if group_info.get("description"):
+        desc = group_info["description"]
 
     for pattern in found_info:
         if (re.search(pattern, name) is not None
@@ -41,7 +45,7 @@ def check_group(group_info, found_info, keywords, blacklist=None, allowed_activi
                 or re.search(pattern, desc) is not None):
             return True
 
-    if allowed_activities is None or group_info["activity"] in allowed_activities:
+    if allowed_activities is None or group_info.get("activity") is None or group_info["activity"] in allowed_activities:
         for keyword_pattern in keywords:
             if (re.search(keyword_pattern, name) is not None
                     or re.search(keyword_pattern, status) is not None
