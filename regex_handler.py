@@ -30,7 +30,7 @@ def get_regex_from_file(filename):
     return patterns
 
 
-def check_group(group_info, found_info, keywords, blacklist=None, allowed_activities=None):
+def check_group(group_info, params):
     name = group_info["name"]
     status = ""
     desc = ""
@@ -39,26 +39,25 @@ def check_group(group_info, found_info, keywords, blacklist=None, allowed_activi
     if group_info.get("description"):
         desc = group_info["description"]
 
-    for pattern in found_info:
+    for pattern in params["found_info"]:
         if (re.search(pattern, name) is not None
                 or re.search(pattern, status) is not None
                 or re.search(pattern, desc) is not None):
             return True
 
-    if allowed_activities is None or group_info.get("activity") is None or group_info["activity"] in allowed_activities:
-        for keyword_pattern in keywords:
+    keyword_count = 0
+    blacklist_count = 0
+    if (len(params["allowed_activities"]) == 0 or group_info.get("activity") is None
+            or group_info["activity"] in params["allowed_activities"]):
+        for keyword_pattern in params["keywords"]:
             if (re.search(keyword_pattern, name) is not None
                     or re.search(keyword_pattern, status) is not None
                     or re.search(keyword_pattern, desc) is not None):
-                if blacklist is None:
-                    return True
-                else:
-                    for blacklist_pattern in blacklist:
-                        if (re.search(blacklist_pattern, name) is not None
-                                or re.search(blacklist_pattern, status) is not None
-                                or re.search(blacklist_pattern, desc) is not None):
-                            return False
-                    return True
+                keyword_count += 1
+        for blacklist_pattern in params["blacklist"]:
+            if (re.search(blacklist_pattern, name) is not None
+                    or re.search(blacklist_pattern, status) is not None
+                    or re.search(blacklist_pattern, desc) is not None):
+                blacklist_count += 1
 
-    return False
-
+    return keyword_count - blacklist_count > 0
