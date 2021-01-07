@@ -21,17 +21,17 @@ def main():
         universities = get_universities(api, user_id)
 
         print("\tworks")
-        print_dict_tabulated(career, "work_name")
+        common.print_dict_tabulated(career, "work_name")
         print("\teducation")
-        print_dict_tabulated(schools, "education_name")
-        print_dict_tabulated(universities, "education_name")
+        common.print_dict_tabulated(schools, "education_name")
+        common.print_dict_tabulated(universities, "education_name")
 
         get_found_career_info(career_params, career)
         get_found_edu_info(edu_params, schools, universities)
         groups = tools.get_all_iter("groups.get", 1000, {"user_id": user_id})
         indexed_groups = index_groups(api, groups, career_params, edu_params)
         print("\tgroups")
-        print_dict_tabulated(indexed_groups, "group_id")
+        common.print_dict_tabulated(indexed_groups, "group_id")
 
         user_info = {
             "works": career,
@@ -40,8 +40,10 @@ def main():
         }
         output[user_id] = user_info
 
-    with open("output.txt", "w") as file:
-        json.dump(output, file, default=str)
+        clear_params(edu_params, career_params)
+
+    with open("output.txt", "w", encoding='utf-8') as file:
+        json.dump(output, file, default=str, ensure_ascii=False)
 
 
 def get_edu_params():
@@ -59,13 +61,6 @@ def get_career_params():
         "keywords": regex_handler.get_regex_from_file("keywords_career.txt"),
         "blacklist": [],
         "allowed_activities": []}
-
-
-def print_dict_tabulated(dictionary, element_tag):
-    for key in dictionary.keys():
-        print("\t\t%s: " % element_tag, "%s" % key)
-        for item in dictionary[key].items():
-            print("\t\t\t%s: " % item[0], "%s" % item[1])
 
 
 def get_schools(api, user_id):
@@ -191,13 +186,22 @@ def index_groups(api, groups, career_params, edu_params):
     for group_id in groups:
         group_info = api.groups.getById(group_id=group_id, fields=["status", "description"])[0]
         if group_info["type"] != "event":
+            tags = []
             if regex_handler.check_group(group_info, edu_params):
-                indexed_groups[group_id] = {"name": group_info["name"], "tags": "[EDUCATION]"}
-                continue
+                indexed_groups[group_id] = {"name": group_info["name"], "tags": tags}
+                tags.append("EDUCATION")
             if group_id in career_params["found_groups"] or regex_handler.check_group(group_info, career_params):
-                indexed_groups[group_id] = {"name": group_info["name"], "tags": "[WORK]"}
+                indexed_groups[group_id] = {"name": group_info["name"], "tags": tags}
+                tags.append("WORK")
 
     return indexed_groups
+
+
+def clear_params(edu_params, career_params):
+    edu_params["found_info"] = []
+    career_params["found_info"] = []
+    career_params["found_groups"] = []
+    career_params["keywords"] = regex_handler.get_regex_from_file("keywords_career.txt")
 
 
 main()

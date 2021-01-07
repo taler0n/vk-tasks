@@ -9,7 +9,7 @@ def main():
     session = common.get_session("credentials.txt")
     api = session.get_api()
     tools = vk_api.VkTools(session)
-    time_period = 30
+    time_period = 3
     output = {}
 
     for user_id in user_ids:
@@ -17,14 +17,18 @@ def main():
         groups_info = get_groups_info(api, tools, user_id, time_period)
         friends_info = get_friends_info(api, tools, user_id, time_period)
 
+        print("\tgroups")
+        common.print_dict_tabulated(groups_info, "group_id")
+        print("\tfriends")
+        common.print_dict_tabulated(friends_info, "friend_id")
+
         user_info = {
             "groups": groups_info,
             "friends": friends_info
         }
         output[user_id] = user_info
-
-    with open("output.txt", "w") as file:
-        json.dump(output, file, default=str)
+    with open("output.txt", "w", encoding='utf-8') as file:
+        json.dump(output, file, default=str, ensure_ascii=False)
 
 
 def get_groups_info(api, tools, user_id, time_period):
@@ -32,14 +36,12 @@ def get_groups_info(api, tools, user_id, time_period):
     groups_info = {}
 
     for group_id in groups:
-        print("\tgroup %s" % group_id)
         keep_reading = True
         request_count = 0
         while keep_reading:
             try:
                 posts = api.wall.get(owner_id=-group_id, count=100, offset=request_count * 100)
-            except vk_api.ApiError as error_msg:
-                print(error_msg)
+            except vk_api.ApiError:
                 break
 
             if len(posts["items"]) == 0:
@@ -55,7 +57,6 @@ def get_groups_info(api, tools, user_id, time_period):
                     post_info = {"group": group_id, "text": post["text"], "date": post_date.date()}
                     groups_info[post["id"]] = post_info
 
-    print("\n")
     return groups_info
 
 
@@ -64,15 +65,13 @@ def get_friends_info(api, tools, user_id, time_period):
     friends_info = {}
 
     for friend_id in friends:
-        print("\tfriend %s" % friend_id)
 
         keep_reading = True
         request_count = 0
         while keep_reading:
             try:
                 posts = api.wall.get(owner_id=friend_id, count=100, offset=request_count * 100)
-            except vk_api.ApiError as error_msg:
-                print(error_msg)
+            except vk_api.ApiError:
                 break
 
             if len(posts["items"]) == 0:
@@ -88,7 +87,6 @@ def get_friends_info(api, tools, user_id, time_period):
                     post_info = {"user": friend_id, "text": post["text"], "date": post_date.date()}
                     friends_info[post["id"]] = post_info
 
-    print("\n")
     return friends_info
 
 

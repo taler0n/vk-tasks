@@ -26,3 +26,10 @@ def get_list(filename, convert_to_int):
             else:
                 new_list.append(line.rstrip())
     return new_list
+
+
+def print_dict_tabulated(dictionary, element_tag):
+    for key in dictionary.keys():
+        print("\t\t%s: " % element_tag, "%s" % key)
+        for item in dictionary[key].items():
+            print("\t\t\t%s: " % item[0], "%s" % item[1])
