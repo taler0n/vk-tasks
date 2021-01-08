@@ -1,24 +1,23 @@
 import re
 
 
-def get_regex_from_found_info(info, is_education):
+def get_regex_from_found_info(info):
     patterns = [re.compile(r"\b" + info + r"\b", re.IGNORECASE)]
-    if is_education:
-        naming_position = info.find(" им. ")
-        if naming_position > 0:
-            shortened = info[0:naming_position]
-            patterns.append(re.compile(r"\b" + shortened + r"\b", re.IGNORECASE))
-        left_brace_position = info.find("(")
-        right_brace_position = info.find(")")
-        if left_brace_position > -1 and right_brace_position - left_brace_position > 0:
-            shortened = info[0:left_brace_position - 1]
-            patterns.append(re.compile(r"\b" + shortened + r"\b", re.IGNORECASE))
-            braced = info[left_brace_position + 1:right_brace_position]
-            former_position = braced.find("бывш. ")
-            if former_position > -1:
-                patterns.append(re.compile(r"\b" + braced[former_position + 6:] + r"\b", re.IGNORECASE))
-            else:
-                patterns.append(re.compile(r"\b" + braced + r"\b", re.IGNORECASE))
+    naming_position = info.find(" им. ")
+    if naming_position > 0:
+        shortened = info[0:naming_position]
+        patterns.append(re.compile(r"\b" + shortened + r"\b", re.IGNORECASE))
+    left_brace_position = info.find("(")
+    right_brace_position = info.find(")")
+    if left_brace_position > -1 and right_brace_position - left_brace_position > 0:
+        shortened = info[0:left_brace_position - 1]
+        patterns.append(re.compile(r"\b" + shortened + r"\b", re.IGNORECASE))
+        braced = info[left_brace_position + 1:right_brace_position]
+        former_position = braced.find("бывш. ")
+        if former_position > -1:
+            patterns.append(re.compile(r"\b" + braced[former_position + 6:] + r"\b", re.IGNORECASE))
+        else:
+            patterns.append(re.compile(r"\b" + braced + r"\b", re.IGNORECASE))
     return patterns
 
 

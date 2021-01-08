@@ -165,9 +165,9 @@ def get_career(api, user_id):
 
 def get_found_edu_info(edu_params, schools, universities):
     for key in schools.keys():
-        edu_params["found_info"] += regex_handler.get_regex_from_found_info(schools[key]["info"]["name"], True)
+        edu_params["found_info"] += regex_handler.get_regex_from_found_info(schools[key]["info"]["name"])
     for key in universities.keys():
-        edu_params["found_info"] += regex_handler.get_regex_from_found_info(universities[key]["info"]["name"], True)
+        edu_params["found_info"] += regex_handler.get_regex_from_found_info(universities[key]["info"]["name"])
 
 
 def get_found_career_info(career_params, career):
@@ -176,7 +176,7 @@ def get_found_career_info(career_params, career):
             career_params["found_groups"].append(key)
         else:
             career_params["found_info"] += \
-                regex_handler.get_regex_from_found_info(career[key]["info"]["company"], False)
+                regex_handler.get_regex_from_found_info(career[key]["info"]["company"])
     if len(career_params["found_groups"]) > 0 or len(career_params["found_info"]) > 0:
         career_params["keywords"] = []
 
