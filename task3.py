@@ -9,7 +9,7 @@ def main():
     session = common.get_session("credentials.txt")
     api = session.get_api()
     tools = vk_api.VkTools(session)
-    time_period = 3
+    time_period = 7
     output = {}
 
     for user_id in user_ids:
@@ -17,10 +17,11 @@ def main():
         groups_info = get_groups_info(api, tools, user_id, time_period)
         friends_info = get_friends_info(api, tools, user_id, time_period)
 
+        print("\n")
         print("\tgroups")
-        common.print_dict_tabulated(groups_info, "group_id")
+        common.print_dict_tabulated(groups_info, "post_id")
         print("\tfriends")
-        common.print_dict_tabulated(friends_info, "friend_id")
+        common.print_dict_tabulated(friends_info, "post_id")
 
         user_info = {
             "groups": groups_info,
@@ -36,6 +37,7 @@ def get_groups_info(api, tools, user_id, time_period):
     groups_info = {}
 
     for group_id in groups:
+        print("group %s" % group_id)
         keep_reading = True
         request_count = 0
         while keep_reading:
@@ -65,7 +67,7 @@ def get_friends_info(api, tools, user_id, time_period):
     friends_info = {}
 
     for friend_id in friends:
-
+        print("friend %s" % friend_id)
         keep_reading = True
         request_count = 0
         while keep_reading:
